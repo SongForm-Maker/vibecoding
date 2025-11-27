@@ -1,5 +1,6 @@
 # 자동 커밋 스크립트
 # 변경된 파일을 감지하고 한글로 커밋 메시지를 생성하여 자동 커밋합니다
+# UTF-8 BOM 인코딩으로 저장되어야 합니다
 
 param(
     [switch]$Watch = $false,
@@ -9,6 +10,7 @@ param(
 # UTF-8 인코딩 설정
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
+$PSDefaultParameterValues['*:Encoding'] = 'utf8'
 
 # Git 사용자 정보 확인
 function Check-GitConfig {
@@ -36,15 +38,15 @@ function Get-CommitMessage {
         return $null
     }
     
-    $categories = @{
-        "페이지" = @("src/pages/", "pages/")
-        "컴포넌트" = @("src/components/", "components/")
-        "스타일" = @("src/index.css", "src/App.css", "tailwind.config", "*.css")
-        "설정" = @("package.json", "tsconfig", "vite.config", "eslint.config", ".gitignore")
-        "라우팅" = @("src/App.tsx", "src/main.tsx")
-        "문서" = @("README", "*.md")
-        "빌드" = @("dist/", "build/")
-    }
+    # 카테고리 매핑 (한글 키 사용)
+    $categories = @{}
+    $categories["페이지"] = @("src/pages/", "pages/")
+    $categories["컴포넌트"] = @("src/components/", "components/")
+    $categories["스타일"] = @("src/index.css", "src/App.css", "tailwind.config", "*.css", "design.json")
+    $categories["설정"] = @("package.json", "tsconfig", "vite.config", "eslint.config", ".gitignore")
+    $categories["라우팅"] = @("src/App.tsx", "src/main.tsx")
+    $categories["문서"] = @("README", "*.md")
+    $categories["빌드"] = @("dist/", "build/")
     
     $messages = @()
     $fileTypes = @{}
@@ -54,15 +56,17 @@ function Get-CommitMessage {
         $fileType = "파일"
         
         # 카테고리 분류
-        foreach ($cat in $categories.Keys) {
-            $patterns = $categories[$cat]
+        foreach ($catKey in $categories.Keys) {
+            $patterns = $categories[$catKey]
+            $found = $false
             foreach ($pattern in $patterns) {
                 if ($file -like "*$pattern*") {
-                    $category = $cat
+                    $category = $catKey
+                    $found = $true
                     break
                 }
             }
-            if ($category -ne "기타") { break }
+            if ($found) { break }
         }
         
         # 파일 타입 분류
