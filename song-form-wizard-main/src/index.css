@@ -2,118 +2,182 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Definition of the design system based on design.json
+All colors MUST be HSL for Tailwind compatibility.
 */
 
 @layer base {
   :root {
-    --background: 210 30% 98%;
-    --foreground: 215 25% 15%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
-
-    --primary: 210 100% 45%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 40 95% 65%;
-    --secondary-foreground: 215 25% 15%;
-
-    --muted: 210 20% 92%;
-    --muted-foreground: 215 15% 45%;
-
-    --accent: 40 95% 65%;
-    --accent-foreground: 215 25% 15%;
-
+    /* === App Background (design.json) === */
+    --app-bg: radial-gradient(circle at top, #020617 0%, #000000 60%);
+    
+    /* === Shell Colors (design.json) === */
+    --shell-bg: 222 47% 11%; /* rgba(15, 23, 42, 0.85) */
+    --shell-bg-opacity: 0.85;
+    --shell-border: 214 20% 65%; /* rgba(148, 163, 184, 0.18) */
+    --shell-border-opacity: 0.18;
+    --shell-shadow: 0 24px 80px rgba(0, 0, 0, 0.85);
+    
+    /* === Primary Accent Colors (design.json) === */
+    --primary: 142 71% 45%; /* #22c55e */
+    --primary-foreground: 222 84% 5%; /* #020617 */
+    --primary-soft: 142 71% 45%; /* rgba(34, 197, 94, 0.18) */
+    --primary-soft-opacity: 0.18;
+    --primary-hover: 142 69% 58%; /* #4ade80 */
+    
+    /* === Input Colors (design.json) === */
+    --input-bg: 222 47% 11%; /* rgba(15, 23, 42, 0.95) */
+    --input-bg-opacity: 0.95;
+    --input-border: 214 20% 65%; /* rgba(148, 163, 184, 0.38) */
+    --input-border-opacity: 0.38;
+    --input-border-focus: 142 71% 45%; /* #22c55e */
+    
+    /* === Chip Colors (design.json) === */
+    --chip-bg: 222 47% 11%; /* rgba(15, 23, 42, 0.9) */
+    --chip-bg-opacity: 0.9;
+    --chip-border: 214 20% 65%; /* rgba(148, 163, 184, 0.32) */
+    --chip-border-opacity: 0.32;
+    --chip-hover-bg: 222 39% 18%; /* rgba(31, 41, 55, 0.95) */
+    --chip-hover-bg-opacity: 0.95;
+    
+    /* === Text Colors (design.json) === */
+    --foreground: 210 20% 98%; /* #f9fafb */
+    --muted-foreground: 216 12% 65%; /* #9ca3af */
+    --soft-foreground: 215 16% 50%; /* #6b7280 */
+    
+    /* === Navigation Colors (design.json) === */
+    --nav-bg: 222 47% 11%; /* rgba(15, 23, 42, 0.9) */
+    --nav-bg-opacity: 0.9;
+    --nav-border: 214 20% 65%; /* rgba(148, 163, 184, 0.18) */
+    --nav-border-opacity: 0.18;
+    --nav-badge-bg: 177 70% 26%; /* rgba(15, 118, 110, 0.18) */
+    --nav-badge-bg-opacity: 0.18;
+    --nav-badge-text: 177 70% 72%; /* #5eead4 */
+    
+    /* === CTA Button Colors (design.json) === */
+    --cta-bg: 142 71% 45%; /* #22c55e */
+    --cta-text: 222 84% 5%; /* #020617 */
+    --cta-hover-bg: 142 69% 58%; /* #4ade80 */
+    
+    /* === Pill Colors (design.json) === */
+    --pill-bg: 222 47% 11%; /* rgba(15, 23, 42, 0.95) */
+    --pill-bg-opacity: 0.95;
+    --pill-border: 214 20% 65%; /* rgba(148, 163, 184, 0.32) */
+    --pill-border-opacity: 0.32;
+    --pill-text: 220 13% 90%; /* #e5e7eb */
+    
+    /* === Scrollbar Colors (design.json) === */
+    --scrollbar-thumb: 214 20% 65%; /* rgba(148, 163, 184, 0.6) */
+    --scrollbar-thumb-opacity: 0.6;
+    --scrollbar-track: 222 47% 11%; /* rgba(15, 23, 42, 0.4) */
+    --scrollbar-track-opacity: 0.4;
+    
+    /* === Legacy Tailwind Variables (for compatibility) === */
+    --background: 222 84% 5%; /* #020617 - dark background */
+    --foreground: 210 20% 98%; /* #f9fafb */
+    
+    --card: 222 47% 11%;
+    --card-foreground: 210 20% 98%;
+    
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 20% 98%;
+    
+    --secondary: 142 69% 58%;
+    --secondary-foreground: 222 84% 5%;
+    
+    --muted: 222 39% 18%;
+    --muted-foreground: 216 12% 65%;
+    
+    --accent: 142 71% 45%;
+    --accent-foreground: 222 84% 5%;
+    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 210 20% 88%;
-    --input: 210 20% 92%;
-    --ring: 210 100% 45%;
-
-    --radius: 0.75rem;
     
-    /* Custom music theme colors */
-    --music-primary: 210 100% 45%;
-    --music-secondary: 40 95% 65%;
-    --music-accent: 195 85% 55%;
-    --music-bg-subtle: 210 25% 96%;
+    --border: 214 20% 65%;
+    --border-opacity: 0.18;
+    --input: 222 47% 11%;
+    --ring: 142 71% 45%;
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 45%), hsl(195 85% 55%));
-    --gradient-subtle: linear-gradient(180deg, hsl(210 30% 98%), hsl(210 25% 96%));
+    --radius: 2rem; /* 32px from design.json appShell */
     
-    /* Animations */
+    /* === Typography (design.json) === */
+    --font-family-main: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --text-headline-size: 2.6rem;
+    --text-headline-weight: 600;
+    --text-headline-letter: -0.04em;
+    --text-sub-size: 0.95rem;
+    --text-sub-weight: 400;
+    --text-nav-size: 0.8rem;
+    --text-nav-weight: 500;
+    --text-input-size: 0.95rem;
+    --text-chip-size: 0.8rem;
+    
+    /* === Component Styles (design.json) === */
+    --shell-radius: 32px;
+    --shell-padding: 24px 32px 28px 32px;
+    --shell-max-width: 1120px;
+    --navbar-height: 56px;
+    --navbar-radius: 999px;
+    --search-height: 72px;
+    --search-radius: 999px;
+    --btn-radius: 999px;
+    --btn-padding-x: 18px;
+    --btn-padding-y: 8px;
+    --chip-radius: 999px;
+    --chip-padding-x: 16px;
+    --chip-padding-y: 8px;
+    
+    /* === Custom music theme colors (updated to match design.json) === */
+    --music-primary: 142 71% 45%; /* #22c55e */
+    --music-secondary: 177 70% 72%; /* #5eead4 */
+    --music-accent: 142 69% 58%; /* #4ade80 */
+    --music-bg-subtle: 222 47% 11%;
+    
+    /* === Gradients === */
+    --gradient-primary: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 69% 58%));
+    --gradient-subtle: radial-gradient(circle at top, #020617 0%, #000000 60%);
+    
+    /* === Animations === */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* === Sidebar (keeping for compatibility) === */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 142 71% 45%;
+    --sidebar-primary-foreground: 222 84% 5%;
+    --sidebar-accent: 222 39% 18%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 214 20% 65%;
+    --sidebar-ring: 142 71% 45%;
   }
 
+  /* Dark mode is now the default, but keeping for compatibility */
   .dark {
-    --background: 215 28% 12%;
-    --foreground: 210 20% 95%;
-
-    --card: 215 25% 16%;
-    --card-foreground: 210 20% 95%;
-
-    --popover: 215 25% 16%;
-    --popover-foreground: 210 20% 95%;
-
-    --primary: 210 100% 55%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 40 95% 65%;
-    --secondary-foreground: 215 28% 12%;
-
-    --muted: 215 20% 22%;
-    --muted-foreground: 210 15% 65%;
-
-    --accent: 40 95% 65%;
-    --accent-foreground: 215 28% 12%;
-
+    --background: 222 84% 5%;
+    --foreground: 210 20% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 20% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 142 71% 45%;
+    --primary-foreground: 222 84% 5%;
+    --secondary: 142 69% 58%;
+    --secondary-foreground: 222 84% 5%;
+    --muted: 222 39% 18%;
+    --muted-foreground: 216 12% 65%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 222 84% 5%;
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 215 20% 22%;
-    --input: 215 20% 22%;
-    --ring: 210 100% 55%;
-    
-    /* Custom music theme colors - dark mode */
-    --music-primary: 210 100% 55%;
-    --music-secondary: 40 95% 65%;
-    --music-accent: 195 85% 60%;
-    --music-bg-subtle: 215 25% 18%;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 55%), hsl(195 85% 60%));
-    --gradient-subtle: linear-gradient(180deg, hsl(215 28% 12%), hsl(215 25% 16%));
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 214 20% 65%;
+    --input: 222 47% 11%;
+    --ring: 142 71% 45%;
+    --music-primary: 142 71% 45%;
+    --music-secondary: 177 70% 72%;
+    --music-accent: 142 69% 58%;
+    --music-bg-subtle: 222 47% 11%;
   }
 }
 
@@ -122,7 +186,35 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html,
   body {
-    @apply bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-main);
+    color: hsl(var(--foreground));
+    background: var(--app-bg);
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  /* Scrollbar styling (design.json) */
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: hsla(var(--scrollbar-thumb) / var(--scrollbar-thumb-opacity));
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: hsla(var(--scrollbar-track) / var(--scrollbar-track-opacity));
   }
 }

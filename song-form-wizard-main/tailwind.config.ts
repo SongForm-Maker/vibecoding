@@ -53,6 +53,32 @@ export default {
           accent: "hsl(var(--music-accent))",
           "bg-subtle": "hsl(var(--music-bg-subtle))",
         },
+        // Design.json color system
+        shell: {
+          bg: "hsla(var(--shell-bg) / var(--shell-bg-opacity))",
+          border: "hsla(var(--shell-border) / var(--shell-border-opacity))",
+        },
+        chip: {
+          bg: "hsla(var(--chip-bg) / var(--chip-bg-opacity))",
+          border: "hsla(var(--chip-border) / var(--chip-border-opacity))",
+          "hover-bg": "hsla(var(--chip-hover-bg) / var(--chip-hover-bg-opacity))",
+        },
+        nav: {
+          bg: "hsla(var(--nav-bg) / var(--nav-bg-opacity))",
+          border: "hsla(var(--nav-border) / var(--nav-border-opacity))",
+          "badge-bg": "hsla(var(--nav-badge-bg) / var(--nav-badge-bg-opacity))",
+          "badge-text": "hsl(var(--nav-badge-text))",
+        },
+        cta: {
+          bg: "hsl(var(--cta-bg))",
+          text: "hsl(var(--cta-text))",
+          "hover-bg": "hsl(var(--cta-hover-bg))",
+        },
+        pill: {
+          bg: "hsla(var(--pill-bg) / var(--pill-bg-opacity))",
+          border: "hsla(var(--pill-border) / var(--pill-border-opacity))",
+          text: "hsl(var(--pill-text))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -68,6 +94,21 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "shell": "var(--shell-radius)",
+        "navbar": "var(--navbar-radius)",
+        "search": "var(--search-radius)",
+        "btn": "var(--btn-radius)",
+        "chip": "var(--chip-radius)",
+      },
+      fontFamily: {
+        sans: ["var(--font-family-main)"],
+      },
+      fontSize: {
+        "headline": "var(--text-headline-size)",
+        "sub": "var(--text-sub-size)",
+        "nav": "var(--text-nav-size)",
+        "input": "var(--text-input-size)",
+        "chip": "var(--text-chip-size)",
       },
       keyframes: {
         "accordion-down": {
