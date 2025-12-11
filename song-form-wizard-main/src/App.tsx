@@ -19,10 +19,32 @@ const AuthCallbackHandler = () => {
     // 페이지 로드 시 세션 확인 및 URL 정리
     const handleAuthCallback = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          // 세션이 있으면 hash를 제거하여 깔끔한 URL 유지
-          if (window.location.hash) {
+        // URL에 access_token이나 error가 있는지 확인 (OAuth 콜백)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasAuthParams = hashParams.has('access_token') || hashParams.has('error');
+        
+        if (hasAuthParams) {
+          console.log('OAuth callback detected, processing...');
+          
+          // 세션 확인
+          const { data: { session }, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error('Error getting session:', error);
+          }
+          
+          if (session) {
+            console.log('Session established successfully');
+            // 세션이 있으면 hash를 제거하여 깔끔한 URL 유지
+            if (window.location.hash) {
+              const cleanUrl = window.location.pathname + window.location.search;
+              window.history.replaceState(null, "", cleanUrl);
+            }
+          }
+        } else {
+          // 일반 페이지 로드 시에도 세션 확인
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session && window.location.hash) {
             window.history.replaceState(null, "", window.location.pathname);
           }
         }
@@ -37,11 +59,19 @@ const AuthCallbackHandler = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
+      
       if (event === "SIGNED_IN" && session) {
+        console.log('User signed in successfully');
         // 로그인 성공 시 hash 제거
         if (window.location.hash) {
-          window.history.replaceState(null, "", window.location.pathname);
+          const cleanUrl = window.location.pathname + window.location.search;
+          window.history.replaceState(null, "", cleanUrl);
         }
+      } else if (event === "SIGNED_OUT") {
+        console.log('User signed out');
+      } else if (event === "TOKEN_REFRESHED") {
+        console.log('Token refreshed');
       }
     });
 

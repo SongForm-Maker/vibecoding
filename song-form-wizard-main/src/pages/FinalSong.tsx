@@ -250,12 +250,12 @@ const FinalSong = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-music-bg-subtle to-background">
       <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Login/Logout UI */}
-        <div className="flex justify-end items-center gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row justify-end items-end sm:items-center gap-2 sm:gap-4 mb-4">
           {loading ? (
-            <span className="text-muted-foreground text-sm">Loading...</span>
+            <span className="text-muted-foreground text-xs sm:text-sm">Loading...</span>
           ) : user ? (
             <>
-              <span className="text-muted-foreground text-sm">{user.email}</span>
+              <span className="text-muted-foreground text-xs sm:text-sm break-all text-right">{user.email}</span>
               <Button 
                 onClick={async () => {
                   try {
@@ -267,6 +267,7 @@ const FinalSong = () => {
                 }} 
                 variant="outline" 
                 size="sm"
+                className="text-xs sm:text-sm"
               >
                 Logout
               </Button>
@@ -283,6 +284,7 @@ const FinalSong = () => {
               }} 
               variant="outline" 
               size="sm"
+              className="text-xs sm:text-sm w-full sm:w-auto"
             >
               Login with Google
             </Button>
@@ -314,39 +316,43 @@ const FinalSong = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
             {user && (
               <Button
                 onClick={handleSave}
                 disabled={isSaving || !state?.songName}
                 variant="outline"
-                className="gap-2"
+                className="gap-2 text-xs sm:text-sm flex-1 sm:flex-initial"
               >
-                <Save className="w-4 h-4" />
-                {isSaving ? "Saving..." : "Save to Database"}
+                <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">{isSaving ? "Saving..." : "Save to Database"}</span>
+                <span className="sm:hidden">{isSaving ? "Saving..." : "Save"}</span>
               </Button>
             )}
             <Button
               onClick={handleDownload}
               variant="outline"
-              className="gap-2"
+              className="gap-2 text-xs sm:text-sm flex-1 sm:flex-initial"
             >
-              <Download className="w-4 h-4" />
-              Download as Text
+              <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Download as Text</span>
+              <span className="sm:hidden">Download</span>
             </Button>
             <Button
               onClick={handleCopyAll}
-              className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90 transition-opacity"
+              className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90 transition-opacity text-xs sm:text-sm flex-1 sm:flex-initial"
             >
               {copied ? (
                 <>
-                  <Check className="w-4 h-4" />
-                  Copied
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Copied</span>
+                  <span className="sm:hidden">Copied</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-4 h-4" />
-                  Copy Full Song
+                  <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Copy Full Song</span>
+                  <span className="sm:hidden">Copy</span>
                 </>
               )}
             </Button>
@@ -354,13 +360,13 @@ const FinalSong = () => {
         </div>
 
         {/* Final Song Display */}
-        <Card className="max-w-4xl mx-auto p-8 shadow-lg border-2 backdrop-blur-sm bg-card/95">
+        <Card className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8 shadow-lg border-2 backdrop-blur-sm bg-card/95">
           {state.songName && (
             <>
-              <h2 className="text-3xl font-bold text-foreground mb-4">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-3 sm:mb-4 break-words">
                 {state.songName}
               </h2>
-              <div className="border-b border-border mb-6" />
+              <div className="border-b border-border mb-4 sm:mb-6" />
             </>
           )}
           <div className="space-y-6">
@@ -378,14 +384,14 @@ const FinalSong = () => {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {/* Section Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-music-primary/20 to-music-accent/20 border-2 border-music-primary/30 flex items-center justify-center">
-                        <span className="font-mono text-xs font-bold text-music-primary">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-music-primary/20 to-music-accent/20 border-2 border-music-primary/30 flex items-center justify-center">
+                        <span className="font-mono text-[10px] sm:text-xs font-bold text-music-primary">
                           {index + 1}
                         </span>
                       </div>
-                      <h2 className="text-lg font-semibold text-music-primary">
+                      <h2 className="text-base sm:text-lg font-semibold text-music-primary break-words">
                         [{section}]
                       </h2>
                     </div>
@@ -395,9 +401,9 @@ const FinalSong = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handleStartEdit(section)}
-                        className="gap-2"
+                        className="gap-2 text-xs sm:text-sm w-full sm:w-auto"
                       >
-                        <Pencil className="w-4 h-4" />
+                        <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
                         Edit
                       </Button>
                     )}
@@ -405,7 +411,7 @@ const FinalSong = () => {
 
                   {/* Section Lyrics - Edit Mode or View Mode */}
                   {isEditing ? (
-                    <div className="pl-11 space-y-3">
+                    <div className="pl-0 sm:pl-11 space-y-3">
                       <Textarea
                         value={tempEditValue}
                         onChange={(e) => setTempEditValue(e.target.value)}
@@ -416,36 +422,36 @@ const FinalSong = () => {
                         <Button
                           size="sm"
                           onClick={() => handleSaveEdit(section)}
-                          className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90"
+                          className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90 text-xs sm:text-sm flex-1 sm:flex-initial"
                         >
-                          <Check className="w-4 h-4" />
+                          <Check className="w-3 h-3 sm:w-4 sm:h-4" />
                           Save
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={handleCancelEdit}
-                          className="gap-2"
+                          className="gap-2 text-xs sm:text-sm flex-1 sm:flex-initial"
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-3 h-3 sm:w-4 sm:h-4" />
                           Cancel
                         </Button>
                       </div>
                     </div>
                   ) : currentLyrics && currentLyrics.trim() ? (
-                    <div className="pl-11 space-y-1">
+                    <div className="pl-0 sm:pl-11 space-y-1">
                       {currentLyrics.split("\n").map((line, lineIndex) => (
                         <p
                           key={lineIndex}
-                          className="text-foreground font-mono text-sm leading-relaxed"
+                          className="text-foreground font-mono text-xs sm:text-sm leading-relaxed break-words"
                         >
                           {line || "\u00A0"}
                         </p>
                       ))}
                     </div>
                   ) : (
-                    <div className="pl-11">
-                      <p className="text-muted-foreground italic text-sm">
+                    <div className="pl-0 sm:pl-11">
+                      <p className="text-muted-foreground italic text-xs sm:text-sm">
                         (instrumental)
                       </p>
                     </div>

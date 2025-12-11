@@ -148,56 +148,58 @@ const Lyrics = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
             <Button
               onClick={handleCopyAll}
               variant="outline"
-              className="gap-2"
+              className="gap-2 text-xs sm:text-sm flex-1 sm:flex-initial"
             >
-              <Copy className="w-4 h-4" />
-              Copy All Lyrics
+              <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Copy All Lyrics</span>
+              <span className="sm:hidden">Copy All</span>
             </Button>
             <Button
               onClick={handleNext}
-              className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90 transition-opacity"
+              className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90 transition-opacity text-xs sm:text-sm flex-1 sm:flex-initial"
             >
-              Next: View Final Song
-              <ArrowRight className="w-4 h-4" />
+              <span className="hidden sm:inline">Next: View Final Song</span>
+              <span className="sm:hidden">Next</span>
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
             </Button>
           </div>
         </div>
 
         {/* Lyrics Input Sections */}
-        <div className="space-y-6 max-w-4xl mx-auto">
+        <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
           {uniqueSections.map((section, index) => (
             <Card
               key={section}
-              className="p-6 shadow-lg border-2 backdrop-blur-sm bg-card/95 animate-in fade-in slide-in-from-bottom-4"
+              className="p-4 sm:p-6 shadow-lg border-2 backdrop-blur-sm bg-card/95 animate-in fade-in slide-in-from-bottom-4"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-music-primary/20 to-music-accent/20 border-2 border-music-primary/30 flex items-center justify-center">
-                    <span className="font-mono font-bold text-music-primary">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-3 sm:mb-4">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-music-primary/20 to-music-accent/20 border-2 border-music-primary/30 flex items-center justify-center">
+                    <span className="font-mono font-bold text-music-primary text-xs sm:text-sm">
                       {section}
                     </span>
                   </div>
-                  <h2 className="text-xl font-semibold">Section: {section}</h2>
+                  <h2 className="text-base sm:text-xl font-semibold">Section: {section}</h2>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleCopySection(section)}
-                  className="gap-2"
+                  className="gap-2 text-xs sm:text-sm w-full sm:w-auto"
                 >
                   {copiedSection === section ? (
                     <>
-                      <Check className="w-4 h-4 text-green-600" />
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                       Copied
                     </>
                   ) : (
                     <>
-                      <Copy className="w-4 h-4" />
+                      <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                       Copy
                     </>
                   )}
@@ -208,7 +210,7 @@ const Lyrics = () => {
                 placeholder={`Paste or type lyrics for section "${section}"...\n\nExample:\nFirst line of lyrics\nSecond line of lyrics\nThird line of lyrics`}
                 value={lyrics[section]}
                 onChange={(e) => handleLyricsChange(section, e.target.value)}
-                className="min-h-[200px] font-mono text-base resize-y border-2 focus:border-music-primary transition-colors"
+                className="min-h-[200px] font-mono text-sm sm:text-base resize-y border-2 focus:border-music-primary transition-colors"
               />
 
               <div className="mt-3 text-xs text-muted-foreground">

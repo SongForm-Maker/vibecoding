@@ -28,9 +28,12 @@ export interface SongForm {
 export async function signInWithGoogle() {
   try {
     // 현재 URL의 origin을 안전하게 가져오기
+    // Vercel 배포 환경과 로컬 환경 모두 지원
     const redirectTo = typeof window !== 'undefined' 
-      ? `${window.location.origin}/`
+      ? `${window.location.origin}${window.location.pathname}`
       : 'http://localhost:8080/';
+    
+    console.log('OAuth redirectTo:', redirectTo);
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
