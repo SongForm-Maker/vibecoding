@@ -7,7 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 interface LocationState {
+  songName?: string;
   structure: string[];
+  lyrics?: Record<string, string>;
 }
 
 const Lyrics = () => {
@@ -41,9 +43,15 @@ const Lyrics = () => {
     // Initialize lyrics state
     const initialLyrics: Record<string, string> = {};
     unique.forEach((section) => {
-      initialLyrics[section] = "";
+      // 기존에 작성한 가사가 있으면 복원, 없으면 빈 문자열
+      initialLyrics[section] = state.lyrics?.[section] || "";
     });
     setLyrics(initialLyrics);
+    
+    // state를 사용했으므로 초기화 (다음 방문 시 중복 방지)
+    if (state.lyrics) {
+      window.history.replaceState({}, document.title);
+    }
   }, [state, navigate]);
 
   const handleLyricsChange = (section: string, value: string) => {
@@ -83,7 +91,13 @@ const Lyrics = () => {
   };
 
   const handleBack = () => {
-    navigate("/");
+    navigate("/", {
+      state: {
+        songName: state.songName,
+        structure: state.structure,
+        lyrics: lyrics, // 작성한 가사도 함께 전달
+      },
+    });
   };
 
   const handleNext = () => {
@@ -95,6 +109,7 @@ const Lyrics = () => {
     
     navigate("/final", { 
       state: { 
+        songName: state.songName,
         structure: state.structure,
         lyrics: lyrics 
       } 
@@ -124,7 +139,7 @@ const Lyrics = () => {
               <Music2 className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-music-primary to-music-accent bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-music-primary to-music-accent bg-clip-text text-transparent leading-normal pb-2">
                 Write Your Lyrics
               </h1>
               <p className="text-muted-foreground">

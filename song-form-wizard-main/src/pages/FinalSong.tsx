@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Music2, ArrowLeft, Copy, Check } from "lucide-react";
+import { Music2, ArrowLeft, Copy, Check, Download, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { saveSongForm, getSongFormByName } from "@/lib/songFormApi";
 
 interface LocationState {
+  songName?: string;
   structure: string[];
   lyrics: Record<string, string>;
 }
@@ -13,8 +24,11 @@ interface LocationState {
 const FinalSong = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, loading, signIn, signOut } = useAuth();
   const state = location.state as LocationState | null;
   const [copied, setCopied] = useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!state?.structure || !state?.lyrics) {
@@ -24,7 +38,13 @@ const FinalSong = () => {
   }, [state, navigate]);
 
   const handleBack = () => {
-    navigate("/lyrics", { state: { structure: state?.structure } });
+    navigate("/lyrics", { 
+      state: { 
+        songName: state?.songName,
+        structure: state?.structure,
+        lyrics: state?.lyrics,
+      } 
+    });
   };
 
   const handleCopyAll = () => {
@@ -46,6 +66,127 @@ const FinalSong = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const getLyricsOnlyText = () => {
+    if (!state) return "";
+    
+    const lyricsParts: string[] = [];
+    
+    state.structure.forEach((section, index) => {
+      const sectionLower = section.toLowerCase();
+      
+      // interlude 섹션 처리
+      if (sectionLower === "interlude") {
+        // interlude 앞에 빈 줄 추가 (이전 섹션이 있고 내용이 있는 경우)
+        if (lyricsParts.length > 0 && lyricsParts[lyricsParts.length - 1].trim().length > 0) {
+          lyricsParts.push("");
+        }
+        lyricsParts.push("[interlude]");
+        // interlude 뒤에 빈 줄 추가
+        lyricsParts.push("");
+        return;
+      }
+      
+      // 일반 섹션 처리
+      const sectionLyrics = state.lyrics[section];
+      if (sectionLyrics && sectionLyrics.trim()) {
+        // 이전 섹션이 interlude가 아니었다면 빈 줄 추가
+        if (index > 0) {
+          const prevSection = state.structure[index - 1].toLowerCase();
+          if (prevSection !== "interlude" && lyricsParts.length > 0 && lyricsParts[lyricsParts.length - 1].trim().length > 0) {
+            lyricsParts.push("");
+          }
+        }
+        lyricsParts.push(sectionLyrics);
+      }
+    });
+    
+    // 맨 첫 줄에 Song Name 추가, 그 다음 빈 줄
+    const songName = state.songName?.trim() || "Song";
+    const lyricsText = lyricsParts.join("\n");
+    return `${songName}\n\n${lyricsText}`;
+  };
+
+  const handleDownload = () => {
+    if (!state) return;
+
+    const lyricsOnly = getLyricsOnlyText();
+    const blob = new Blob([lyricsOnly], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    
+    // 파일명: song_name_날짜 형식
+    const songName = state.songName?.trim() || "song";
+    const date = new Date().toISOString().split("T")[0];
+    const fileName = `${songName}_${date}.txt`;
+    
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("Song downloaded as text file");
+  };
+
+  const handleSave = async () => {
+    if (!state || !user) {
+      toast.error("Please log in to save your song");
+      return;
+    }
+
+    if (!state.songName || !state.songName.trim()) {
+      toast.error("Please enter a song name");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      // 기존 파일 확인
+      const existingSong = await getSongFormByName(state.songName.trim());
+      
+      if (existingSong.success && existingSong.data) {
+        // 기존 파일이 있으면 업데이트 확인 다이얼로그 표시
+        setShowUpdateDialog(true);
+        setIsSaving(false);
+        return;
+      }
+
+      // 기존 파일이 없으면 바로 저장
+      await performSave();
+    } catch (error) {
+      console.error("Error checking existing song:", error);
+      toast.error("Failed to check existing song");
+      setIsSaving(false);
+    }
+  };
+
+  const performSave = async () => {
+    if (!state) return;
+
+    setIsSaving(true);
+    setShowUpdateDialog(false);
+
+    try {
+      const result = await saveSongForm(
+        state.songName!.trim(),
+        state.structure,
+        state.lyrics
+      );
+
+      if (result.success) {
+        toast.success("Song saved successfully!");
+      } else {
+        toast.error(result.error || "Failed to save song");
+      }
+    } catch (error) {
+      console.error("Error saving song:", error);
+      toast.error("Failed to save song");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (!state?.structure || !state?.lyrics) {
     return null;
   }
@@ -53,6 +194,46 @@ const FinalSong = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-music-bg-subtle to-background">
       <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* Login/Logout UI */}
+        <div className="flex justify-end items-center gap-4 mb-4">
+          {loading ? (
+            <span className="text-muted-foreground text-sm">Loading...</span>
+          ) : user ? (
+            <>
+              <span className="text-muted-foreground text-sm">{user.email}</span>
+              <Button 
+                onClick={async () => {
+                  try {
+                    await signOut();
+                    toast.success("Logged out successfully");
+                  } catch (error) {
+                    toast.error("Failed to log out");
+                  }
+                }} 
+                variant="outline" 
+                size="sm"
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button 
+              onClick={async () => {
+                try {
+                  await signIn();
+                  // OAuth는 리디렉션되므로 여기서는 메시지 표시 안 함
+                } catch (error) {
+                  toast.error("Failed to sign in. Please check if Google OAuth is enabled in Supabase.");
+                }
+              }} 
+              variant="outline" 
+              size="sm"
+            >
+              Login with Google
+            </Button>
+          )}
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -69,7 +250,7 @@ const FinalSong = () => {
               <Music2 className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-music-primary to-music-accent bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-music-primary to-music-accent bg-clip-text text-transparent leading-normal pb-2">
                 Final Song
               </h1>
               <p className="text-muted-foreground">
@@ -78,7 +259,26 @@ const FinalSong = () => {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            {user && (
+              <Button
+                onClick={handleSave}
+                disabled={isSaving || !state?.songName}
+                variant="outline"
+                className="gap-2"
+              >
+                <Save className="w-4 h-4" />
+                {isSaving ? "Saving..." : "Save to Database"}
+              </Button>
+            )}
+            <Button
+              onClick={handleDownload}
+              variant="outline"
+              className="gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Download as Text
+            </Button>
             <Button
               onClick={handleCopyAll}
               className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90 transition-opacity"
@@ -100,6 +300,14 @@ const FinalSong = () => {
 
         {/* Final Song Display */}
         <Card className="max-w-4xl mx-auto p-8 shadow-lg border-2 backdrop-blur-sm bg-card/95">
+          {state.songName && (
+            <>
+              <h2 className="text-3xl font-bold text-foreground mb-4">
+                {state.songName}
+              </h2>
+              <div className="border-b border-border mb-6" />
+            </>
+          )}
           <div className="space-y-6">
             {state.structure.map((section, index) => {
               const sectionLyrics = state.lyrics[section];
@@ -178,6 +386,36 @@ const FinalSong = () => {
             </div>
           </div>
         </Card>
+
+        {/* Update Confirmation Dialog */}
+        <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Update Existing Song?</DialogTitle>
+              <DialogDescription>
+                A song with the name "{state?.songName}" already exists. Do you want to update it with the current content?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowUpdateDialog(false);
+                  setIsSaving(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={performSave}
+                disabled={isSaving}
+                className="bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90"
+              >
+                {isSaving ? "Updating..." : "Update"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

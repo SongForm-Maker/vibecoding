@@ -12,3 +12,8 @@ echo.
 powershell -ExecutionPolicy Bypass -File "%~dp0auto-commit.ps1" -Watch
 pause
 
+
+
+
+
+
