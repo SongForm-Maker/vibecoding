@@ -158,22 +158,98 @@ const FinalSong = () => {
     if (!state) return;
 
     const lyricsOnly = getLyricsOnlyText();
-    const blob = new Blob([lyricsOnly], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
     
     // 파일명: song_name_날짜 형식
     const songName = state.songName?.trim() || "song";
     const date = new Date().toISOString().split("T")[0];
     const fileName = `${songName}_${date}.txt`;
     
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    toast.success("Song downloaded as text file");
+    // 모바일 기기 감지 (iOS Safari 포함)
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    if (isMobile || isIOS) {
+      // 모바일/iOS에서는 Data URL을 사용하여 새 창에서 열기
+      try {
+        const blob = new Blob([lyricsOnly], { type: "text/plain;charset=utf-8" });
+        const reader = new FileReader();
+        
+        reader.onloadend = () => {
+          const dataUrl = reader.result as string;
+          const newWindow = window.open();
+          if (newWindow) {
+            newWindow.document.write(`
+              <html>
+                <head>
+                  <meta charset="utf-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>${fileName}</title>
+                  <style>
+                    body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      padding: 20px;
+                      white-space: pre-wrap;
+                      word-wrap: break-word;
+                    }
+                    .download-link {
+                      display: inline-block;
+                      margin-bottom: 20px;
+                      padding: 10px 20px;
+                      background-color: #007AFF;
+                      color: white;
+                      text-decoration: none;
+                      border-radius: 8px;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <a href="${dataUrl}" download="${fileName}" class="download-link">📥 Download ${fileName}</a>
+                  <br><br>
+                  ${lyricsOnly.replace(/\n/g, '<br>')}
+                </body>
+              </html>
+            `);
+            newWindow.document.close();
+            toast.success("File opened in new window. Long press the download link to save.");
+          } else {
+            // 팝업이 차단된 경우 클립보드에 복사
+            navigator.clipboard.writeText(lyricsOnly).then(() => {
+              toast.success("File content copied to clipboard. Please paste it into a text editor and save.");
+            }).catch(() => {
+              toast.error("Please copy the text manually from the page.");
+            });
+          }
+        };
+        
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        console.error("Error creating download for mobile:", error);
+        // 실패 시 클립보드에 복사
+        navigator.clipboard.writeText(lyricsOnly).then(() => {
+          toast.success("Content copied to clipboard. Please paste and save manually.");
+        }).catch(() => {
+          toast.error("Please copy the text manually.");
+        });
+      }
+    } else {
+      // 데스크톱에서는 기존 방식 사용
+      const blob = new Blob([lyricsOnly], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // URL 해제를 약간 지연시켜 다운로드가 완료되도록 함
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 100);
+      
+      toast.success("Song downloaded as text file");
+    }
   };
 
   const handleSave = async () => {
