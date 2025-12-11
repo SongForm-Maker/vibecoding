@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Music2, ArrowLeft, Copy, Check, Download, Save } from "lucide-react";
+import { Music2, ArrowLeft, Copy, Check, Download, Save, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -29,30 +30,72 @@ const FinalSong = () => {
   const [copied, setCopied] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // 가사 수정을 위한 상태
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [editedLyrics, setEditedLyrics] = useState<Record<string, string>>({});
+  const [tempEditValue, setTempEditValue] = useState("");
 
   useEffect(() => {
     if (!state?.structure || !state?.lyrics) {
       navigate("/");
       return;
     }
+    // 초기 가사 상태를 editedLyrics에 복사
+    if (state.lyrics && Object.keys(editedLyrics).length === 0) {
+      setEditedLyrics({ ...state.lyrics });
+    }
   }, [state, navigate]);
 
   const handleBack = () => {
+    // 수정된 가사가 있으면 그것을 전달, 없으면 원본 가사 전달
+    const lyricsToPass = Object.keys(editedLyrics).length > 0 
+      ? editedLyrics 
+      : state?.lyrics || {};
+    
     navigate("/lyrics", { 
       state: { 
         songName: state?.songName,
         structure: state?.structure,
-        lyrics: state?.lyrics,
+        lyrics: lyricsToPass,
       } 
     });
+  };
+
+  // 가사 편집 시작
+  const handleStartEdit = (section: string) => {
+    const currentLyrics = editedLyrics[section] || state?.lyrics[section] || "";
+    setTempEditValue(currentLyrics);
+    setEditingSection(section);
+  };
+
+  // 가사 편집 취소
+  const handleCancelEdit = () => {
+    setEditingSection(null);
+    setTempEditValue("");
+  };
+
+  // 가사 편집 저장
+  const handleSaveEdit = (section: string) => {
+    setEditedLyrics((prev) => ({
+      ...prev,
+      [section]: tempEditValue,
+    }));
+    setEditingSection(null);
+    setTempEditValue("");
+    toast.success(`Lyrics for "${section}" updated`);
   };
 
   const handleCopyAll = () => {
     if (!state) return;
 
+    // 수정된 가사가 있으면 그것을 사용, 없으면 원본 사용
+    const lyricsToUse = Object.keys(editedLyrics).length > 0 
+      ? editedLyrics 
+      : state.lyrics;
+
     const fullSong = state.structure
       .map((section) => {
-        const sectionLyrics = state.lyrics[section];
+        const sectionLyrics = lyricsToUse[section];
         if (sectionLyrics && sectionLyrics.trim()) {
           return `[${section}]\n${sectionLyrics}`;
         }
@@ -68,6 +111,11 @@ const FinalSong = () => {
 
   const getLyricsOnlyText = () => {
     if (!state) return "";
+    
+    // 수정된 가사가 있으면 그것을 사용, 없으면 원본 사용
+    const lyricsToUse = Object.keys(editedLyrics).length > 0 
+      ? editedLyrics 
+      : state.lyrics;
     
     const lyricsParts: string[] = [];
     
@@ -87,7 +135,7 @@ const FinalSong = () => {
       }
       
       // 일반 섹션 처리
-      const sectionLyrics = state.lyrics[section];
+      const sectionLyrics = lyricsToUse[section];
       if (sectionLyrics && sectionLyrics.trim()) {
         // 이전 섹션이 interlude가 아니었다면 빈 줄 추가
         if (index > 0) {
@@ -168,14 +216,21 @@ const FinalSong = () => {
     setShowUpdateDialog(false);
 
     try {
+      // 수정된 가사가 있으면 그것을 사용, 없으면 원본 사용
+      const lyricsToSave = Object.keys(editedLyrics).length > 0 
+        ? editedLyrics 
+        : state.lyrics;
+
       const result = await saveSongForm(
         state.songName!.trim(),
         state.structure,
-        state.lyrics
+        lyricsToSave
       );
 
       if (result.success) {
         toast.success("Song saved successfully!");
+        // 저장 후 editedLyrics를 업데이트하여 원본과 동기화
+        setEditedLyrics(lyricsToSave);
       } else {
         toast.error(result.error || "Failed to save song");
       }
@@ -310,7 +365,11 @@ const FinalSong = () => {
           )}
           <div className="space-y-6">
             {state.structure.map((section, index) => {
-              const sectionLyrics = state.lyrics[section];
+              // 수정된 가사가 있으면 그것을 사용, 없으면 원본 사용
+              const currentLyrics = editedLyrics[section] !== undefined 
+                ? editedLyrics[section] 
+                : state.lyrics[section];
+              const isEditing = editingSection === section;
               
               return (
                 <div
@@ -319,21 +378,63 @@ const FinalSong = () => {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {/* Section Header */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-music-primary/20 to-music-accent/20 border-2 border-music-primary/30 flex items-center justify-center">
-                      <span className="font-mono text-xs font-bold text-music-primary">
-                        {index + 1}
-                      </span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-music-primary/20 to-music-accent/20 border-2 border-music-primary/30 flex items-center justify-center">
+                        <span className="font-mono text-xs font-bold text-music-primary">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <h2 className="text-lg font-semibold text-music-primary">
+                        [{section}]
+                      </h2>
                     </div>
-                    <h2 className="text-lg font-semibold text-music-primary">
-                      [{section}]
-                    </h2>
+                    {/* Edit Button */}
+                    {!isEditing && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleStartEdit(section)}
+                        className="gap-2"
+                      >
+                        <Pencil className="w-4 h-4" />
+                        Edit
+                      </Button>
+                    )}
                   </div>
 
-                  {/* Section Lyrics */}
-                  {sectionLyrics && sectionLyrics.trim() ? (
+                  {/* Section Lyrics - Edit Mode or View Mode */}
+                  {isEditing ? (
+                    <div className="pl-11 space-y-3">
+                      <Textarea
+                        value={tempEditValue}
+                        onChange={(e) => setTempEditValue(e.target.value)}
+                        className="min-h-[200px] font-mono text-sm resize-y border-2 focus:border-music-primary transition-colors"
+                        placeholder={`Enter lyrics for section "${section}"...`}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveEdit(section)}
+                          className="gap-2 bg-gradient-to-r from-music-primary to-music-accent hover:opacity-90"
+                        >
+                          <Check className="w-4 h-4" />
+                          Save
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelEdit}
+                          className="gap-2"
+                        >
+                          <X className="w-4 h-4" />
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : currentLyrics && currentLyrics.trim() ? (
                     <div className="pl-11 space-y-1">
-                      {sectionLyrics.split("\n").map((line, lineIndex) => (
+                      {currentLyrics.split("\n").map((line, lineIndex) => (
                         <p
                           key={lineIndex}
                           className="text-foreground font-mono text-sm leading-relaxed"
@@ -375,7 +476,10 @@ const FinalSong = () => {
               <p className="text-sm text-muted-foreground">Total lines</p>
               <p className="text-2xl font-bold text-music-primary">
                 {state.structure.reduce((total, section) => {
-                  const sectionLyrics = state.lyrics[section];
+                  // 수정된 가사가 있으면 그것을 사용, 없으면 원본 사용
+                  const sectionLyrics = editedLyrics[section] !== undefined 
+                    ? editedLyrics[section] 
+                    : state.lyrics[section];
                   if (!sectionLyrics) return total;
                   return (
                     total +
