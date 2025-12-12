@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Music2, Plus, Trash2, ArrowRight, FileText, GripVertical, X, Check, Pencil, FolderOpen } from "lucide-react";
+import { Music2, Plus, Trash2, ArrowRight, FileText, GripVertical, X, Check, Pencil, FolderOpen, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,6 +36,7 @@ const Index = () => {
   const [showLoadDialog, setShowLoadDialog] = useState(false);
   const [savedSongs, setSavedSongs] = useState<SongForm[]>([]);
   const [loadingSongs, setLoadingSongs] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Lyrics 페이지에서 돌아왔을 때 기존 내용 복원
   useEffect(() => {
@@ -187,6 +188,7 @@ const Index = () => {
 
     setLoadingSongs(true);
     setShowLoadDialog(true);
+    setSearchQuery(""); // 다이얼로그 열 때 검색어 초기화
 
     try {
       const result = await getAllSongForms();
@@ -205,6 +207,11 @@ const Index = () => {
       setLoadingSongs(false);
     }
   };
+
+  // 검색어로 악보 필터링
+  const filteredSongs = savedSongs.filter((song) =>
+    song.song_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleSelectSong = (song: SongForm) => {
     if (!song.song_name || !song.structure) {
@@ -530,25 +537,61 @@ const Index = () => {
         </div>
 
         {/* Load Saved Songs Dialog */}
-        <Dialog open={showLoadDialog} onOpenChange={setShowLoadDialog}>
+        <Dialog 
+          open={showLoadDialog} 
+          onOpenChange={(open) => {
+            setShowLoadDialog(open);
+            if (!open) {
+              setSearchQuery(""); // 다이얼로그 닫을 때 검색어 초기화
+            }
+          }}
+        >
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Load Saved Song</DialogTitle>
               <DialogDescription>
-                Select a saved song to load. Songs are organized by song name.
+                Search and select a saved song to load. Songs are organized by song name.
               </DialogDescription>
             </DialogHeader>
+            
+            {/* 검색 입력 필드 */}
+            <div className="mt-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search by song name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {searchQuery && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  {filteredSongs.length} song{filteredSongs.length !== 1 ? 's' : ''} found
+                </p>
+              )}
+            </div>
+
             <div className="space-y-2 mt-4">
               {loadingSongs ? (
                 <div className="text-center py-8 text-muted-foreground">
                   Loading saved songs...
                 </div>
-              ) : savedSongs.length === 0 ? (
+              ) : filteredSongs.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  No saved songs found.
+                  {searchQuery ? (
+                    <>
+                      No songs found matching "{searchQuery}".
+                      <br />
+                      <span className="text-xs">Try a different search term.</span>
+                    </>
+                  ) : (
+                    "No saved songs found."
+                  )}
                 </div>
               ) : (
-                savedSongs.map((song) => (
+                filteredSongs.map((song) => (
                   <Card
                     key={song.id}
                     className="p-4 hover:bg-music-primary/10 cursor-pointer transition-colors"
