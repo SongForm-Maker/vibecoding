@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Music2, Plus, Trash2, ArrowRight, FileText, GripVertical, X, Check, Pencil, FolderOpen, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -306,8 +306,16 @@ const Index = () => {
             Song Form Maker
           </h1>
           <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
-            Organize your song's form with ease. Enter sections like verse, chorus, bridge using simple notation.
+            Organize your song&apos;s form with ease. Enter sections like verse, chorus, bridge using simple notation.
           </p>
+          <div className="mt-4 flex justify-center">
+            <Link
+              to="/blog"
+              className="text-xs sm:text-sm text-primary underline hover:text-primary/90"
+            >
+              곡 구조와 작곡 팁이 궁금하다면 블로그 글도 확인해 보세요 →
+            </Link>
+          </div>
         </div>
 
         {/* Main Input Card */}
@@ -529,10 +537,93 @@ const Index = () => {
           <Card className="p-6 bg-music-bg-subtle/50 border border-border/50">
             <h3 className="font-semibold mb-3 text-foreground">Example Structures:</h3>
             <div className="space-y-2 text-sm text-muted-foreground font-mono">
-              <p>• <span className="text-music-primary">a1, a2, b, c, d</span></p>
-              <p>• <span className="text-music-primary">intro - verse - chorus - verse - chorus - bridge - chorus - outro</span></p>
-              <p>• <span className="text-music-primary">a, b, c, c, c, interlude, d, d, outro</span></p>
+              <p>
+                • <span className="text-music-primary">a1, a2, b, c, d</span>
+              </p>
+              <p>
+                •{" "}
+                <span className="text-music-primary">
+                  intro - verse - chorus - verse - chorus - bridge - chorus - outro
+                </span>
+              </p>
+              <p>
+                • <span className="text-music-primary">a, b, c, c, c, interlude, d, d, outro</span>
+              </p>
             </div>
+          </Card>
+        </div>
+
+        {/* Song Form 기본 개념 정리 섹션 */}
+        <div className="max-w-3xl mx-auto mt-8 space-y-4">
+          <Card className="p-6 bg-card border border-border/60">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">송폼(Song Form) 기본 개념 정리</h2>
+
+            <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <p>
+                노래를 만들 때 멜로디와 가사만큼 중요한 것이 바로 곡의 구조, 즉{" "}
+                <span className="font-semibold text-foreground">송폼(Song Form)</span>
+                입니다. 같은 아이디어라도 어떤 순서로 배치하느냐에 따라 곡의 흐름, 긴장감, 기억에 남는 정도가 완전히
+                달라집니다.
+              </p>
+
+              <p className="font-semibold text-foreground mt-4">· Intro (인트로)</p>
+              <p>
+                곡의 첫인상을 결정하는 구간입니다. 전체적인 분위기와 장르를 암시하고, 청취자가 이어서 듣고 싶게 만드는
+                역할을 합니다. 보통은 비교적 간결하게 구성하지만, 곡의 개성을 강하게 드러내는 경우도 많습니다.
+              </p>
+
+              <p className="font-semibold text-foreground mt-3">· Verse (벌스)</p>
+              <p>
+                이야기를 구체적으로 풀어 가는 부분입니다. 가사와 감정을 조금씩 쌓아 올리며 후렴을 위한 기반을 만드는
+                역할을 합니다. 멜로디는 비교적 차분한 경우가 많고, 가사의 전개가 중요하게 작용합니다.
+              </p>
+
+              <p className="font-semibold text-foreground mt-3">· Chorus (코러스)</p>
+              <p>
+                곡의 핵심 메시지와 훅(Hook)이 담기는 가장 인상적인 구간입니다. 청취자가 가장 잘 기억하는 부분이기
+                때문에, 멜로디와 가사 모두 직관적이고 강하게 느껴지는 경우가 많습니다.
+              </p>
+
+              <p className="font-semibold text-foreground mt-3">· Bridge (브리지)</p>
+              <p>
+                반복되는 패턴 속에서 새로운 느낌을 주는 구간입니다. 다른 코드 진행이나 멜로디를 사용해 귀를 환기시키고,
+                마지막 코러스로 자연스럽게 연결되도록 도와줍니다.
+              </p>
+
+              <p className="font-semibold text-foreground mt-3">· Interlude (인터루드)</p>
+              <p>
+                보컬이 없는 연주 구간이거나, 섹션 사이를 자연스럽게 이어 주는 짧은 연결 파트입니다. 전반적인 흐름을
+                끊지 않으면서도 분위기를 전환하는 데 자주 쓰입니다.
+              </p>
+
+              <p className="font-semibold text-foreground mt-3">· Outro (아웃트로)</p>
+              <p>
+                곡을 마무리하는 구간으로, 여운을 남기거나 서서히 에너지를 줄이는 역할을 담당합니다. 인트로의 모티브를
+                다시 사용해서 곡 전체를 하나로 묶어 주기도 합니다.
+              </p>
+
+              <p className="mt-4">
+                이처럼 각 섹션은 저마다의 역할과 감정을 가지고 있고, 어떤 순서로 배치하느냐에 따라 곡의 이야기와 몰입도가
+                크게 달라집니다. 구조를 의도적으로 설계하면, 청취자가 자연스럽게 따라오면서도 인상적인 포인트를 더 잘
+                느낄 수 있습니다.
+              </p>
+            </div>
+          </Card>
+
+          {/* 서비스와 자연스럽게 연결하는 섹션 */}
+          <Card className="p-5 bg-music-bg-subtle/60 border border-border/60">
+            <h3 className="text-lg font-semibold mb-2 text-foreground">떠오른 구조 아이디어, 바로 정리해 보세요</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              위에서 소개한 Intro, Verse, Chorus, Bridge, Outro, Interlude를 조합해 마음속에 떠오른 곡의 흐름을 상상해
+              봤다면,
+              <span className="font-semibold text-foreground">
+                {" "}
+                이제 바로 위의 입력창에서 그 구조를 입력해 보세요.
+              </span>{" "}
+              간단한 텍스트만으로도 섹션 순서를 한눈에 확인하고, 드래그로 재배치하면서 더 자연스럽고 기억에 남는 송폼을
+              설계할 수 있습니다. Song Form Maker는 아이디어 단계의 러프한 구조부터, 완성 직전의 정교한 구조까지
+              체계적으로 정리할 수 있도록 돕는 도구입니다.
+            </p>
           </Card>
         </div>
 

@@ -9,6 +9,8 @@ import { supabase } from "@/lib/supabase";
 import Index from "./pages/Index";
 import Lyrics from "./pages/Lyrics";
 import FinalSong from "./pages/FinalSong";
+import BlogList from "./pages/BlogList";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -95,6 +97,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/lyrics" element={<Lyrics />} />
             <Route path="/final" element={<FinalSong />} />
+            <Route path="/blog" element={<BlogList />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
