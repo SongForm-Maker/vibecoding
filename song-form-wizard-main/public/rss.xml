@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Song Form Maker - 곡 구조와 작곡 팁 블로그</title>
+    <link>https://vibecoding-blue-psi.vercel.app</link>
+    <description>송폼(Song Form)과 곡 구조에 대한 정보, 작곡 팁, 그리고 Song Form Maker 사용법을 다루는 블로그입니다.</description>
+    <language>ko-KR</language>
+    <lastBuildDate>2025-12-18T02:12:08.304Z</lastBuildDate>
+    <atom:link href="https://vibecoding-blue-psi.vercel.app/rss.xml" rel="self" type="application/rss+xml" />
+        <item>
+      <title>초보 작곡가를 위한 곡 구조(송폼) 설계 팁</title>
+      <link>https://vibecoding-blue-psi.vercel.app/blog/song-form-tips-for-beginners</link>
+      <description>처음 곡을 쓰는 사람들을 위한 송폼 설계 팁과 자주 사용하는 패턴, 실전에서 바로 활용 가능한 구조 아이디어를 정리했습니다.</description>
+      <pubDate>Thu, 02 Jan 2025 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://vibecoding-blue-psi.vercel.app/blog/song-form-tips-for-beginners</guid>
+    </item>
+    <item>
+      <title>송폼(Song Form)이란 무엇인가? 곡 구조의 기본 이해</title>
+      <link>https://vibecoding-blue-psi.vercel.app/blog/what-is-song-form</link>
+      <description>Intro, Verse, Chorus, Bridge, Outro, Interlude 등 곡 구조의 기본 개념을 정리하고, 왜 송폼이 중요한지 설명합니다.</description>
+      <pubDate>Wed, 01 Jan 2025 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://vibecoding-blue-psi.vercel.app/blog/what-is-song-form</guid>
+    </item>
+  </channel>
+</rss>
